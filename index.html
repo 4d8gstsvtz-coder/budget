@@ -10,6 +10,7 @@ main{max-width:520px;margin:0 auto;padding:16px}h1{font-size:24px;margin:4px 0 1
 .big{font-size:30px;font-weight:700}.mu{color:var(--mu);font-size:14px}.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .bar{height:10px;background:var(--ln);border-radius:9px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--pkd);border-radius:9px}
 .al{padding:10px 12px;border-radius:14px;margin-bottom:8px;font-size:14px;background:var(--yl)}.al.x{background:var(--rd)}
+input[type=date]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;display:block;min-height:46px;text-align:left}
 button{font:inherit;border:0;border-radius:14px;padding:10px 14px;background:var(--pk);color:var(--tx);cursor:pointer}button.p{background:var(--pkd);color:#fff;font-weight:600}button.g{background:var(--ln)}button:disabled{opacity:.55}
 input,select,textarea{font:inherit;width:100%;padding:11px;border-radius:12px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);margin:4px 0 8px}
 nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--ln);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
@@ -24,7 +25,7 @@ nav button{flex:1;background:none;font-size:11px;padding:6px 0;color:var(--mu)}n
 <nav id="nv"></nav><div id="sh" onclick="if(event.target==this)cl()"><div id="shc"></div></div><div id="t"></div>
 <script>
 var D=[["prod","🛒","Продукти"],["clo","👗","Одяг"],["sta","✏️","Канцтовари"],["toy","🧸","Іграшки"],["bab","🍼","Немовля"],["car","🚗","Машина"],["hlt","💊","Здоров’я"],["cat","🐱","Коти"],["me","💅","Особисте"],["gif","🎁","Подарунки"],["home","🏠","Дім"],["sch","🎒","Школа"],["util","💡","Комунальні"],["sub","📺","Підписки"],["fun","🎈","Розваги"],["oth","📦","Інше"]];
-var KW={prod:"атб сільпо новус варус еко ашан їжа продукт",hlt:"аптека ліки лікар",cat:"корм кіт кіш",car:"wog окко бензин паливо мийка",bab:"підгузк памперс дитяч",util:"світло газ вода комунал",sub:"netflix spotify підписк",fun:"кіно кафе ресторан"};
+var KW={prod:"атб сільпо новус варус еко ашан фора метро їжа хліб молоко овочі фрукти",hlt:"аптека ліки лікар",cat:"корм кіт кіш",car:"wog окко бензин паливо мийка",bab:"підгузк памперс дитяч",util:"світло газ вода комунал",sub:"netflix spotify підписк",fun:"кіно кафе ресторан"};
 var S=load()||{b:0,lim:{},cats:D.map(function(x){return{id:x[0],e:x[1],n:x[2]}}),ex:[],rc:[],gl:[],inc:false},tab="home",ld=0;
 function load(){try{return JSON.parse(localStorage.getItem("mb1"))}catch(e){return null}}
 function save(){try{localStorage.setItem("mb1",JSON.stringify(S));ld=0}catch(e){toast("Не вдалося зберегти у браузері")}}
@@ -38,7 +39,7 @@ function mon(m){var a=m.split("-");return["січ","лют","бер","кві","�
 function sum(m,c,k){return S.ex.filter(function(x){return x.d.slice(0,7)==m&&(k=="i"?x.k=="i":x.k!="i")&&(!c||x.c==c)}).reduce(function(s,x){return s+x.a},0)}
 function toast(t){var e=$("t");e.textContent=t;e.style.display="block";setTimeout(function(){e.style.display="none"},2600)}
 function cl(){$("sh").className=""}function sheet(h){$("shc").innerHTML=h;$("sh").className="on"}
-function sel(id,v){return'<select id="'+id+'">'+S.cats.map(function(c){return'<option value="'+c.id+'"'+(c.id==v?" selected":"")+">"+c.e+" "+esc(c.n)+"</option>"}).join("")+"</select>"}
+function sel(id,v){return'<select id="'+id+'"'+(id=="fc"?' onchange="man=1"':"")+'>'+S.cats.map(function(c){return'<option value="'+c.id+'"'+(c.id==v?" selected":"")+">"+c.e+" "+esc(c.n)+"</option>"}).join("")+"</select>"}
 function go(t){tab=t;render()}
 function render(){var T=[["home","🏠","Головна"],["hist","🧾","Історія"],["ch","📊","Графіки"],["pl","🎯","Плани"],["more","⚙️","Ще"]];
 $("nv").innerHTML=T.map(function(x){return'<button class="'+(tab==x[0]?"on":"")+'" onclick="go(\''+x[0]+'\')"><b>'+x[1]+"</b>"+x[2]+"</button>"}).join("");
@@ -55,23 +56,28 @@ if(!b)h+='<p class="mu">Бюджет ще не встановлено. Нати�
 else h+='<div class="big">'+money(left)+'</div><div class="mu">залишилось із '+money(b)+" · витрачено "+money(sp)+'</div><div class="bar"><i style="width:'+Math.min(100,pc)+'%"></i></div><p class="mu" style="margin:10px 0 0">Рекомендовано на день: <b>'+(left>0?money(left/dl):"0 ₴")+"</b> (залишилось днів: "+dl+")</p>";
 h+="</div>";
 if(S.inc){var i=sum(m,0,"i");h+='<div class="c r"><span>Доходи за місяць</span><b>'+money(i)+'</b></div><div class="c r"><span>Дохід мінус витрати</span><b>'+money(i-sp)+"</b></div>"}
+if(S.gl.length){var tot=0,mm=0,pl=0,dn=0;S.gl.forEach(function(g){tot+=g.s;(g.h||[]).forEach(function(x){if(x.d.slice(0,7)==m)mm+=x.a});if(g.m){pl+=g.m;if(g.pd&&g.pd[m])dn+=g.m}});h+='<div class="c" onclick="go(\'pl\')"><div class="mu">💰 Заощадження (окремо від бюджету)</div><div class="big">'+money(tot)+'</div><div class="mu">внесено цього місяця: '+money(mm)+(pl?" · за планом "+money(dn)+" із "+money(pl):"")+"</div>"+S.gl.map(function(g){return'<div class="r mu" style="margin-top:4px"><span>'+esc(g.n)+"</span><span>"+money(g.s)+"</span></div>"}).join("")+"</div>"}
 h+="<h2>За категоріями</h2>";
 if(!rows.length)h+='<div class="c mu">Витрат ще немає. Натисніть «+», щоб додати першу.</div>';
 rows.forEach(function(r){h+='<div class="c"><div class="r"><span>'+r.c.e+" "+esc(r.c.n)+"</span><b>"+money(r.s)+"</b></div>"+(r.l?'<div class="bar"><i style="width:'+Math.min(100,r.s/r.l*100)+'%"></i></div><div class="mu">ліміт '+money(r.l)+"</div>":"")+"</div>"});
 return h};
 function budSheet(){sheet('<h2>Бюджет на місяць</h2><input id="bb" type="number" inputmode="decimal" value="'+(S.b||"")+'" placeholder="Сума, ₴"><button class="p" onclick="S.b=+$(\'bb\').value||0;save();cl();render()">Зберегти</button>')}
-function parse(t){var o={a:"",s:"",c:"oth",d:td()},l=t.toLowerCase();
-var m=t.match(/(\d+[\d\s]*[.,]?\d*)\s*(грн|₴|uah)?/i);if(m){o.a=parseFloat(m[1].replace(/\s/g,"").replace(",","."))||"";}
+var man=0;
+function parse(t){t=t.replace(/['`ʼ]/g,"’");var o={a:"",s:"",c:"oth",d:td(),sure:0},l=t.toLowerCase();
+var m=t.match(/(\d[\d\s]*(?:[.,]\d+)?)\s*(?:грн|₴|uah|гривень|гривні)(?![А-Яа-яІіЇїЄєҐґ])/i)||t.match(/\d[\d\s]*(?:[.,]\d+)?/);
+if(m){var n=parseFloat((m[1]!==undefined?m[1]:m[0]).replace(/\s/g,"").replace(",","."));if(n>0)o.a=n}
 if(/вчора/.test(l)){var y=new Date();y.setDate(y.getDate()-1);o.d=y.getFullYear()+"-"+p2(y.getMonth()+1)+"-"+p2(y.getDate())}
-var rest=t.replace(m?m[0]:"","").replace(/вчора|сьогодні/ig,"").trim();o.s=rest.split(/\s+/).slice(0,1).join(" ");
-var hit=0;S.cats.forEach(function(c){if(!hit&&c.n.length>3&&l.indexOf(c.n.toLowerCase().slice(0,-1))>-1){o.c=c.id;hit=1}});
-if(!hit)for(var k in KW)if(!hit&&KW[k].split(" ").some(function(w){return l.indexOf(w)>-1})){o.c=k;hit=1}
-o.sure=hit;return o}
-function addSheet(e){var x=e||{};sheet('<h2>'+(x.id?"Редагувати":"Нова витрата")+"</h2>"+(x.id?"":'<label class="mu">Швидкий запис текстом</label><input id="qt" placeholder="АТБ 850 грн продукти"><button class="g" onclick="fill()">Розпізнати текст</button> <button class="g" disabled>📷 Фото чека — заплановано</button><div class="mu">Перевірте поля нижче перед збереженням.</div>')+
+var st0=(m?t.replace(m[0],""):t).replace(/вчора|сьогодні/ig,""),stem=null;
+S.cats.forEach(function(c){if(o.sure)return;var n=c.n.toLowerCase();if(n.length<3)return;var st=n.length>4?n.slice(0,-1):n;if(l.indexOf(st)>-1){o.c=c.id;o.sure=1;stem=st}});
+if(!o.sure)for(var k in KW)if(!o.sure&&S.cats.some(function(c){return c.id==k})&&KW[k].split(" ").some(function(w){return l.indexOf(w)>-1})){o.c=k;o.sure=1}
+var W=st0.split(/[^A-Za-zА-Яа-яІіЇїЄєҐґ0-9’-]+/).filter(Boolean).filter(function(w){return!(stem&&w.toLowerCase().indexOf(stem)==0)&&!/^(грн|uah|гривень|гривні)$/i.test(w)});
+o.s=W[0]||"";return o}
+function auto(){if(man)return;var v=$("qt").value.trim();if(!v)return;var o=parse(v),c=o.sure?o.c:"oth";$("fa").value=o.a;$("fs").value=o.s;$("fd").value=o.d;if(S.cats.some(function(x){return x.id==c}))$("fc").value=c}
+function addSheet(e){var x=e||{};man=0;sheet('<h2>'+(x.id?"Редагувати":"Нова витрата")+"</h2>"+(x.id?"":'<label class="mu">Швидкий запис текстом (поля заповняться самі)</label><input id="qt" placeholder="330 грн, продукти" oninput="auto()" onchange="fill()"><button class="g" onclick="fill()">Розпізнати текст</button> <label style="display:inline-block;background:var(--ln);padding:10px 14px;border-radius:14px;margin-top:6px">📷 Фото чека<input type="file" accept="image/*" hidden onchange="ocrFile(this.files[0])"></label><div class="mu">Перевірте поля нижче перед збереженням.</div>')+
 (S.inc?'<select id="fk"><option value="e">Витрата</option><option value="i"'+(x.k=="i"?" selected":"")+">Дохід</option></select>":"")+
-'<input id="fa" type="number" inputmode="decimal" placeholder="Сума, ₴" value="'+(x.a||"")+'"><input id="fd" type="date" value="'+(x.d||td())+'"><input id="fs" placeholder="Магазин / назва" value="'+esc(x.s||"")+'">'+sel("fc",x.c||"prod")+'<input id="fn" placeholder="Нотатка (необов’язково)" value="'+esc(x.t||"")+'">'+
+'<input id="fa" oninput="man=1" type="number" inputmode="decimal" placeholder="Сума, ₴" value="'+(x.a||"")+'"><input id="fd" type="date" value="'+(x.d||td())+'"><input id="fs" oninput="man=1" placeholder="Магазин / назва" value="'+esc(x.s||"")+'">'+sel("fc",x.c||"prod")+'<input id="fn" placeholder="Нотатка (необов’язково)" value="'+esc(x.t||"")+'">'+
 '<button class="p" onclick="saveEx(\''+(x.id||"")+'\')">Зберегти</button> '+(x.id?'<button class="g" onclick="delEx(\''+x.id+'\')">Видалити</button>':""))}
-function fill(){var o=parse($("qt").value);$("fa").value=o.a;$("fd").value=o.d;$("fs").value=o.s;$("fc").value=o.c;toast(o.sure?"Розпізнано. Перевірте поля":"Категорію не вгадано — оберіть вручну")}
+function fill(){man=0;auto();toast(parse($("qt").value).sure?"Розпізнано. Перевірте поля":"Категорію не вгадано — оберіть вручну")}
 var dupOK=0;function saveEx(id){var a=+$("fa").value;if(!(a>0))return toast("Вкажіть суму більше 0");
 var o={id:id||uid(),a:a,d:$("fd").value||td(),s:$("fs").value.trim(),c:$("fc").value,t:$("fn").value.trim(),k:S.inc&&$("fk").value=="i"?"i":"e"};
 if(!id&&!dupOK&&S.ex.some(function(x){return x.a==o.a&&x.d==o.d&&x.s==o.s&&x.k==o.k})){dupOK=1;return toast("Схожа витрата вже є. Натисніть «Зберегти» ще раз, якщо це не дублікат")}
@@ -90,25 +96,38 @@ S.cats.forEach(function(c){var a=sum(cur,c.id),b=sum(pv,c.id);if(!a&&!b)return;a
 return h+(any?"":'<span class="mu">Дані з’являться, коли додасте витрати.</span>')+"</div>"};
 V.pl=function(){var m=td().slice(0,7),h="<h1>Плани</h1><h2>Регулярні платежі</h2>";
 S.rc.forEach(function(r){var done=S.ex.some(function(x){return x.r==r.id+m});h+='<div class="c r"><div>'+cat(r.c).e+" "+esc(r.n)+'<div class="mu">'+money(r.a)+", щомісяця "+r.day+"-го</div></div><div>"+(done?"✓ додано ":'<button class="p" onclick="recAdd(\''+r.id+'\')">Додати</button> ')+'<button class="g" onclick="recDel(\''+r.id+'\')">✕</button></div></div>'});
-h+='<button onclick="recSheet()">+ Регулярний платіж</button><div class="mu" style="margin-top:6px">Автоматичного списання немає: натискайте «Додати» щомісяця (повторно не додасться).</div><h2>Фінансові цілі</h2>';
-S.gl.forEach(function(g){var p=g.t?Math.min(100,g.s/g.t*100):0;h+='<div class="c"><div class="r"><b>'+esc(g.n)+"</b><span>"+money(g.s)+" / "+money(g.t)+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div><div style="margin-top:8px"><button onclick="glAdd(\''+g.id+'\')">+ Внести</button> <button class="g" onclick="glDel(\''+g.id+'\')">Видалити</button></div></div>'});
+h+='<button onclick="recSheet()">+ Регулярний платіж</button><div class="mu" style="margin-top:6px">Автоматичного списання немає: натискайте «Додати» щомісяця (повторно не додасться).</div><h2>Цілі та банки (техніка, відпустка…)</h2>';
+S.gl.forEach(function(g){var p=g.t?Math.min(100,g.s/g.t*100):0,pd=(g.pd||{})[m],mo="";if(g.m){var lf=Math.max(0,g.t-g.s);mo='<div class="mu" style="margin-top:6px">Щомісячний внесок: '+money(g.m)+(lf>0?" · ще місяців: "+Math.ceil(lf/g.m):" · ціль досягнуто")+"</div>"}
+h+='<div class="c"><div class="r"><b>'+esc(g.n)+"</b><span>"+money(g.s)+" / "+money(g.t)+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div>'+mo+'<div style="margin-top:8px">'+(g.m?(pd?"✓ внесено цього місяця ":'<button class="p" onclick="glPay(\''+g.id+'\')">Внесено цього місяця</button> '):"")+'<button onclick="glAdd(\''+g.id+'\')">+ Внести</button> <button class="g" onclick="glMon(\''+g.id+'\')">Внесок</button> <button class="g" onclick="glDel(\''+g.id+'\')">Видалити</button></div></div>'});
+h+='<div class="mu">Внески в банки не віднімаються від місячного бюджету витрат.</div>';
 return h+'<button onclick="glSheet()">+ Нова ціль</button>'};
 function recSheet(){sheet('<h2>Регулярний платіж</h2><input id="rn" placeholder="Назва (наприклад, Інтернет)"><input id="ra" type="number" inputmode="decimal" placeholder="Сума, ₴">'+sel("rcc","util")+'<input id="rd" type="number" placeholder="День місяця (1–28)" min="1" max="28"><button class="p" onclick="recSave()">Зберегти</button>')}
 function recSave(){var a=+$("ra").value;if(!$("rn").value||!(a>0))return toast("Вкажіть назву й суму");S.rc.push({id:uid(),n:$("rn").value,a:a,c:$("rcc").value,day:Math.min(28,Math.max(1,+$("rd").value||1))});save();cl();render()}
 function recAdd(id){var r=S.rc.filter(function(x){return x.id==id})[0],m=td().slice(0,7);if(S.ex.some(function(x){return x.r==id+m}))return;S.ex.push({id:uid(),a:r.a,d:m+"-"+p2(r.day),s:r.n,c:r.c,t:"Регулярний платіж",k:"e",r:id+m});save();render()}
 function recDel(id){S.rc=S.rc.filter(function(x){return x.id!=id});save();render()}
-function glSheet(){sheet('<h2>Нова ціль</h2><input id="gn" placeholder="Назва"><input id="gt" type="number" inputmode="decimal" placeholder="Потрібна сума, ₴"><button class="p" onclick="if($(\'gn\').value&&+$(\'gt\').value>0){S.gl.push({id:uid(),n:$(\'gn\').value,t:+$(\'gt\').value,s:0});save();cl();render()}">Зберегти</button>')}
-function glAdd(id){sheet('<h2>Внести на ціль</h2><input id="gv" type="number" inputmode="decimal" placeholder="Сума, ₴"><button class="p" onclick="var v=+$(\'gv\').value;S.gl.forEach(function(g){if(g.id==\''+id+'\')g.s+=v});save();cl();render()">Додати</button>')}
+function glSheet(){sheet('<h2>Нова ціль / банка</h2><div><button class="g" onclick="$(\'gn\').value=\'Техніка\'">Техніка</button> <button class="g" onclick="$(\'gn\').value=\'Відпустка\'">Відпустка</button></div><input id="gn" placeholder="Назва"><input id="gt" type="number" inputmode="decimal" placeholder="Потрібна сума, ₴"><input id="gm" type="number" inputmode="decimal" placeholder="Щомісячний внесок, ₴ (необов’язково)"><button class="p" onclick="glNew()">Зберегти</button>')}
+function glNew(){var t=+$("gt").value;if(!$("gn").value||!(t>0))return toast("Вкажіть назву й суму");var g={id:uid(),n:$("gn").value,t:t,s:0},v=+$("gm").value;if(v>0)g.m=v;S.gl.push(g);save();cl();render()}
+function glPay(id){var m=td().slice(0,7);S.gl.forEach(function(g){if(g.id==id&&g.m&&!(g.pd&&g.pd[m])){g.s+=g.m;g.pd=g.pd||{};g.pd[m]=1;(g.h=g.h||[]).push({d:td(),a:g.m})}});save();render()}
+function glMon(id){var g=S.gl.filter(function(x){return x.id==id})[0];sheet('<h2>Щомісячний внесок</h2><input id="gm" type="number" inputmode="decimal" placeholder="Сума, ₴ (порожньо — без внеску)" value="'+(g.m||"")+'"><button class="p" onclick="var v=+$(\'gm\').value;S.gl.forEach(function(x){if(x.id==\''+id+'\'){if(v>0)x.m=v;else delete x.m}});save();cl();render()">Зберегти</button>')}
+function glAdd(id){sheet('<h2>Внести на ціль</h2><input id="gv" type="number" inputmode="decimal" placeholder="Сума, ₴"><button class="p" onclick="var v=+$(\'gv\').value;S.gl.forEach(function(g){if(g.id==\''+id+'\'){g.s+=v;(g.h=g.h||[]).push({d:td(),a:v})}});save();cl();render()">Додати</button>')}
 function glDel(id){S.gl=S.gl.filter(function(x){return x.id!=id});save();render()}
 V.more=function(){var h="<h1>Ще</h1><h2>Категорії</h2><div class=\"c\">";
 S.cats.forEach(function(c){h+='<div class="row r" onclick="catSheet(\''+c.id+'\')"><span>'+c.e+" "+esc(c.n)+'</span><span class="mu">'+(S.lim[c.id]?"ліміт "+money(S.lim[c.id]):"без ліміту")+"</span></div>"});
 h+='</div><button onclick="catSheet()">+ Нова категорія</button><h2>Налаштування</h2><div class="c r"><span>Вести облік доходів (необов’язково)</span><input type="checkbox" style="width:24px" '+(S.inc?"checked":"")+' onchange="S.inc=this.checked;save();render()"></div>';
 h+='<h2>Дані та приватність</h2><div class="c mu">Усе зберігається лише в цьому браузері на вашому пристрої. Нічого не надсилається в інтернет. Дані можуть зникнути, якщо очистити дані Safari, тому робіть резервні копії.</div><button onclick="csv()">Експорт CSV</button> <button onclick="bk()">Резервна копія</button> <button onclick="rs()">Відновити</button> <button class="g" onclick="wipe()">Стерти все</button>';
-h+='<h2>Поділитися</h2><div class="c mu">Надсилається лише посилання на застосунок, ваші витрати та налаштування не передаються. Той, хто його відкриє, матиме власний окремий бюджет.</div><button class="p" onclick="shareApp()">Поділитися застосунком</button>';return h+'<h2>Заплановано</h2><div class="c mu">📷 Розпізнавання фото чеків і скриншотів — ще не реалізовано.<br>☁️ Синхронізація між пристроями — ще не реалізовано.<br>🔔 Push-сповіщення — ще не реалізовано (попередження видно в застосунку).</div>'};
+h+='<h2>Поділитися</h2><div class="c mu">Надсилається лише посилання на застосунок, ваші витрати та налаштування не передаються. Той, хто його відкриє, матиме власний окремий бюджет.</div><button class="p" onclick="shareApp()">Поділитися застосунком</button>';return h+'<h2>Заплановано</h2><div class="c mu">📷 Фото чеків: розпізнається на вашому телефоні, точність обмежена — завжди перевіряйте поля.<br>☁️ Синхронізація між пристроями — ще не реалізовано.<br>🔔 Push-сповіщення — ще не реалізовано (попередження видно в застосунку).</div>'};
 function catSheet(id){var c=S.cats.filter(function(x){return x.id==id})[0]||{e:"🙂",n:"",id:""};sheet('<h2>'+(id?"Категорія":"Нова категорія")+'</h2><input id="ce" value="'+esc(c.e)+'" maxlength="4" placeholder="Емодзі"><input id="cn" value="'+esc(c.n)+'" placeholder="Назва"><input id="cl" type="number" inputmode="decimal" placeholder="Ліміт на місяць, ₴ (необов’язково)" value="'+(S.lim[id]||"")+'"><button class="p" onclick="catSave(\''+id+'\')">Зберегти</button> '+(id?'<button class="g" onclick="catDel(\''+id+'\')">Видалити</button>':""))}
 function catSave(id){var n=$("cn").value.trim();if(!n)return toast("Вкажіть назву");var k=id||uid();if(id)S.cats.forEach(function(c){if(c.id==id){c.n=n;c.e=$("ce").value||"🙂"}});else S.cats.push({id:k,n:n,e:$("ce").value||"🙂"});var l=+$("cl").value;if(l>0)S.lim[k]=l;else delete S.lim[k];save();cl();render()}
 function catDel(id){var u=S.ex.filter(function(x){return x.c==id}).length;if(u){S.ex.forEach(function(x){if(x.c==id)x.c="oth"});toast("Витрати ("+u+") переміщено в «Інше»")}if(id=="oth"&&S.cats.length>1){}S.cats=S.cats.filter(function(c){return c.id!=id});delete S.lim[id];if(!S.cats.some(function(c){return c.id=="oth"}))S.cats.push({id:"oth",e:"📦",n:"Інше"});save();cl();render()}
 function cpu(u){try{navigator.clipboard.writeText(u).then(function(){toast("Посилання скопійовано")},function(){toast("Не вдалося скопіювати")})}catch(e){toast("Не вдалося скопіювати")}}
+function loadT(){return new Promise(function(ok,no){if(window.Tesseract)return ok();var e=document.createElement("script");e.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";e.onload=ok;e.onerror=no;document.head.appendChild(e)})}
+function ocrFile(f){if(!f)return;toast("Розпізнаю… може тривати до хвилини");loadT().then(function(){return Tesseract.recognize(f,"ukr+eng")}).then(function(r){addSheet(readReceipt(r.data.text));toast("Перевірте поля перед збереженням")}).catch(function(){toast("Не вдалося розпізнати. Для першого запуску потрібен інтернет")})}
+function readReceipt(t){var L=t.split(/\n/).map(function(x){return x.trim()}).filter(Boolean),o={d:td(),a:"",s:"",c:"oth",t:"З фото (перевірте)"};
+var m=t.match(/(\d{2})[.\/-](\d{2})[.\/-](\d{4}|\d{2})/);if(m&&+m[2]<=12&&+m[1]<=31)o.d=(m[3].length==2?"20"+m[3]:m[3])+"-"+m[2]+"-"+m[1];
+var best=0;L.forEach(function(l){if(/разом|сума|до сплати|всього|итого|total/i.test(l)){var n=l.match(/\d+(?:\s\d{3})*[.,]\d{2}/);if(n)best=parseFloat(n[0].replace(/\s/g,"").replace(",","."))}});
+if(!best)(t.match(/\d+[.,]\d{2}/g)||[]).forEach(function(v){v=parseFloat(v.replace(",","."));if(v>best)best=v});
+o.a=best||"";for(var i=0;i<Math.min(L.length,4);i++)if(/[А-Яа-яІіЇїЄєA-Za-z]{3,}/.test(L[i])){o.s=L[i].slice(0,40);break}
+o.c=parse(t).c;return o}
 function shareApp(){var u=location.href;if(navigator.share){navigator.share({title:"Мій бюджет",text:"Мій бюджет — застосунок для сімейних витрат",url:u}).catch(function(e){if(!e||e.name!="AbortError")cpu(u)})}else cpu(u)}
 function box(t,txt,btn){sheet("<h2>"+t+'</h2><textarea id="bx" rows="8">'+esc(txt)+"</textarea>"+btn)}
 function cp(){var e=$("bx");e.select();try{navigator.clipboard.writeText(e.value).then(function(){toast("Скопійовано")},function(){toast("Утримуйте текст і виберіть «Скопіювати»")})}catch(x){toast("Утримуйте текст і виберіть «Скопіювати»")}}
