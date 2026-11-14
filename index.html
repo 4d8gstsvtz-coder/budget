@@ -45,15 +45,15 @@ function render(){var T=[["home","🏠","Головна"],["hist","🧾","Іст
 $("nv").innerHTML=T.map(function(x){return'<button class="'+(tab==x[0]?"on":"")+'" onclick="go(\''+x[0]+'\')"><b>'+x[1]+"</b>"+x[2]+"</button>"}).join("");
 $("app").innerHTML=V[tab]();if(tab=="hist")hl()}
 var V={};
-V.home=function(){var m=td().slice(0,7),sp=sum(m),b=S.b,left=b-sp,d=new Date(),dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate(),dl=dim-d.getDate()+1,al="";
+V.home=function(){var m=td().slice(0,7),sp=sum(m),tp=(S.tp||[]).filter(function(x){return x.d.slice(0,7)==m}).reduce(function(a,x){return a+x.a},0),b=S.b+tp,left=b-sp,d=new Date(),dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate(),dl=dim-d.getDate()+1,al="";
 var pc=b?sp/b*100:0;
 function warn(n,p){if(p>=100)return'<div class="al x">⛔ '+n+": ліміт використано на "+Math.round(p)+"%</div>";if(p>=90)return'<div class="al x">⚠️ '+n+": використано 90%</div>";if(p>=80)return'<div class="al">⚠️ '+n+": використано 80%</div>";return""}
 if(b)al+=warn("Загальний бюджет",pc);
 var rows=S.cats.map(function(c){var s=sum(m,c.id),l=S.lim[c.id]||0;if(l)al+=warn(c.e+" "+esc(c.n),s/l*100);return{c:c,s:s,l:l}}).filter(function(r){return r.s||r.l}).sort(function(a,b){return b.s-a.s});
 var h="<h1>Мій бюджет 👛</h1>"+al;
-h+='<div class="c"><div class="r"><span class="mu">Бюджет на місяць</span><button class="g" onclick="budSheet()">Змінити</button></div>';
+h+='<div class="c"><div class="r"><span class="mu">Бюджет на місяць</span><span><button class="g" onclick="topSheet()">+ Поповнити</button> <button class="g" onclick="budSheet()">Змінити</button></span></div>';
 if(!b)h+='<p class="mu">Бюджет ще не встановлено. Натисніть «Змінити».</p>';
-else h+='<div class="big">'+money(left)+'</div><div class="mu">залишилось із '+money(b)+" · витрачено "+money(sp)+'</div><div class="bar"><i style="width:'+Math.min(100,pc)+'%"></i></div><p class="mu" style="margin:10px 0 0">Рекомендовано на день: <b>'+(left>0?money(left/dl):"0 ₴")+"</b> (залишилось днів: "+dl+")</p>";
+else h+='<div class="big">'+money(left)+'</div><div class="mu">залишилось із '+money(b)+" · витрачено "+money(sp)+(tp?"<br>(бюджет "+money(S.b)+(tp>0?" + ":" − ")+"поповнення "+money(Math.abs(tp))+")":"")+'</div><div class="bar"><i style="width:'+Math.min(100,pc)+'%"></i></div><p class="mu" style="margin:10px 0 0">Рекомендовано на день: <b>'+(left>0?money(left/dl):"0 ₴")+"</b> (залишилось днів: "+dl+")</p>";
 h+="</div>";
 if(S.inc){var i=sum(m,0,"i");h+='<div class="c r"><span>Доходи за місяць</span><b>'+money(i)+'</b></div><div class="c r"><span>Дохід мінус витрати</span><b>'+money(i-sp)+"</b></div>"}
 if(S.gl.length){var tot=0,mm=0,pl=0,dn=0;S.gl.forEach(function(g){tot+=g.s;(g.h||[]).forEach(function(x){if(x.d.slice(0,7)==m)mm+=x.a});if(g.m){pl+=g.m;if(g.pd&&g.pd[m])dn+=g.m}});h+='<div class="c" onclick="go(\'pl\')"><div class="mu">💰 Заощадження (окремо від бюджету)</div><div class="big">'+money(tot)+'</div><div class="mu">внесено цього місяця: '+money(mm)+(pl?" · за планом "+money(dn)+" із "+money(pl):"")+"</div>"+S.gl.map(function(g){return'<div class="r mu" style="margin-top:4px"><span>'+esc(g.n)+"</span><span>"+money(g.s)+"</span></div>"}).join("")+"</div>"}
@@ -170,6 +170,14 @@ L.forEach(function(x){var c=cat(x.c);h+='<div class="row r" onclick="addSheet(S.
 if(!L.length)h+='<p class="mu">Записів немає.</p>';
 sheet(h)}
 (function(){var old=V.ch;V.ch=function(){var tg='<div class="r" style="gap:6px;margin-bottom:12px"><button class="'+(chv=="m"?"p":"g")+'" style="flex:1" onclick="chv=\'m\';render()">По місяцях</button><button class="'+(chv=="d"?"p":"g")+'" style="flex:1" onclick="chv=\'d\';render()">По днях</button></div>';return chv=="d"?"<h1>Графіки</h1>"+tg+chDays():old().replace("<h1>Графіки</h1>","<h1>Графіки</h1>"+tg)}})();
+function topSheet(){var m=td().slice(0,7),L=(S.tp||[]).filter(function(x){return x.d.slice(0,7)==m}),h='<h2>Поповнити залишок</h2><div class="mu">Сума додасться до бюджету цього місяця. Місячний бюджет і доходи не змінюються. З наступного місяця діє звичайний бюджет.</div><input id="tv" type="number" inputmode="decimal" placeholder="Сума, ₴ (мінус — щоб зменшити)"><input id="tn" placeholder="Нотатка (наприклад, аванс, подарунок)"><button class="p" onclick="topAdd()">Додати до залишку</button><h2>Або встановити точний залишок</h2><div class="mu">Старий залишок буде замінено на вказану суму (наприклад, обнулити й записати нові кошти).</div><input id="tz" type="number" inputmode="decimal" placeholder="Новий залишок, ₴" oninput="tzPv()"><div class="mu" id="tzp" style="margin-bottom:8px"></div><button class="p" onclick="topSet()">Встановити залишок</button>';
+if(L.length)h+='<h2>Поповнення цього місяця</h2>'+L.map(function(x){return'<div class="row r"><div>'+x.d.split("-").reverse().slice(0,2).join(".")+(x.n?" · "+esc(x.n):"")+"</div><span><b>"+(x.a>0?"+":"")+money(x.a)+'</b> <button class="g" onclick="topDel(\''+x.id+'\')">✕</button></span></div>'}).join("");
+sheet(h)}
+function topAdd(){var v=+$("tv").value;if(!v)return toast("Вкажіть суму");S.tp=S.tp||[];S.tp.push({id:uid(),d:td(),a:v,n:$("tn").value.trim()});save();cl();render()}
+function topDel(id){S.tp=(S.tp||[]).filter(function(x){return x.id!=id});save();topSheet();render()}
+function curLeft(){var m=td().slice(0,7),tp=(S.tp||[]).filter(function(x){return x.d.slice(0,7)==m}).reduce(function(a,x){return a+x.a},0);return S.b+tp-sum(m)}
+function tzPv(){var v=$("tz").value;$("tzp").textContent=v===""?"":"Було "+money(curLeft())+" → стане "+money(+v)}
+function topSet(){var v=$("tz").value;if(v==="")return toast("Вкажіть суму");v=+v;var l=curLeft(),d=Math.round((v-l)*100)/100;if(!d)return toast("Залишок уже такий");S.tp=S.tp||[];S.tp.push({id:uid(),d:td(),a:d,n:"Залишок встановлено: "+money(v)+" (було "+money(l)+")"});save();cl();render()}
 function shareApp(){var u=location.href;if(navigator.share){navigator.share({title:"Мій бюджет",text:"Мій бюджет — застосунок для сімейних витрат",url:u}).catch(function(e){if(!e||e.name!="AbortError")cpu(u)})}else cpu(u)}
 function box(t,txt,btn){sheet("<h2>"+t+'</h2><textarea id="bx" rows="8">'+esc(txt)+"</textarea>"+btn)}
 function cp(){var e=$("bx");e.select();try{navigator.clipboard.writeText(e.value).then(function(){toast("Скопійовано")},function(){toast("Утримуйте текст і виберіть «Скопіювати»")})}catch(x){toast("Утримуйте текст і виберіть «Скопіювати»")}}
